@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doce de Graça</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #282c34;
+      color: #61dafb;
+      text-align: center;
+    }
+    .container {
+      max-width: 400px;
+      padding: 20px;
+      border: 2px solid #61dafb;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #61dafb;
+      color: #282c34;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #4a99cb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>O Negão quer saber sua localização um doce de graça de chocolate ☺</h1>
+    <p>Clique no botão abaixo para compartilhar sua localização.</p>
+    <button onclick="getLocation()">Compartilhar Localização</button>
+    <p id="location-output"></p>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const API_KEY = '3aa4100735d04983ac2170463ee2c7de'; // Substitua pela sua chave de API
+
+    function getLocation() {
+      const output = document.getElementById('location-output');
+      const message = document.getElementById('message');
+      
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else { 
+        output.innerHTML = "Geolocalização não é suportada pelo seu navegador.";
+      }
+    }
+
+    function showPosition(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+          const locationDetails = data.results[0].formatted;
+          document.getElementById('location-output').innerHTML = `Localização: ${locationDetails}`;
+          document.getElementById('message').innerHTML = "O Negão está chegando, espere e verá....";
+        })
+        .catch(() => {
+          document.getElementById('location-output').innerHTML = "Não foi possível obter informações detalhadas sobre a localização.";
+        });
+    }
+
+    function showError(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          alert("Usuário negou o pedido de Geolocalização.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Informação de localização não está disponível.");
+          break;
+        case error.TIMEOUT:
+          alert("O pedido para obter a localização demorou muito.");
+          break;
+        case error.UNKNOWN_ERROR:
+          alert("Ocorreu um erro desconhecido.");
+          break;
+      }
+    }
+  </script>
+</body>
+</html>
